@@ -9,6 +9,8 @@ class Login extends Component {
             if (!err) {
                 const {username, password} = values
                 console.log(username, password)
+            } else {
+                console.error(err)
             }
     });
     }
