@@ -1,20 +1,37 @@
 import React, { Component } from 'react'
-import { Form, Icon, Input, Button, Checkbox } from 'antd'
+import { Redirect } from 'react-router'
+import { Form, Icon, Input, Button, Checkbox , message} from 'antd'
+
 import './index.css'
 import logo from '../../assets/images/logo.png'
+import { reqLogin } from '../../api'
+import memoryUtil from '../../utils/memoryUtil'
+import { saveUser } from '../../utils/storageUtil'
+
 class Login extends Component {
     handleSubmit = (e) => {
         e.preventDefault()
-        this.props.form.validateFields((err, values) => {
+        this.props.form.validateFields(async (err, values) => {
             if (!err) {
                 const {username, password} = values
-                console.log(username, password)
+                const {data} = await reqLogin(username, password)
+                if (data.status === 0) {
+                    saveUser(data.data)
+                    this.props.history.replace('/')
+                } else {
+                    message.error('登陆失败')
+                }
             } else {
                 console.error(err)
             }
     });
     }
     render() {
+        const user = memoryUtil.user
+        console.log(user)
+        if (user && user._id) {
+            return <Redirect to="/"/>
+        }
         const { getFieldDecorator } = this.props.form
         return (
             <div className="login">
